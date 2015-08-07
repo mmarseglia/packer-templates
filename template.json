@@ -1,0 +1,107 @@
+{
+  "variables": {
+    "os": "centos-6-6",
+    "application": "base",
+    "headless": "",
+    "iso_checksum": "4ed6c56d365bd3ab12cd88b8a480f4a62e7c66d2",
+    "iso_url": "http://your.host.here/CentOS-6.6-x86_64-minimal.iso",
+    "boot_command" : "<tab> text ks=",
+    "guest_os_type": "centos-64"
+  },
+  "builders": [
+    {
+      "name": "virtualbox",
+      "type": "virtualbox-iso",
+      "boot_command": [ "{{user `boot_command`}}http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{user `os`}}-ks.cfg<enter><wait>" ],
+      "boot_wait": "10s",
+      "headless" : "{{user `headless`}}",
+      "disk_size": 40520,
+      "guest_os_type": "{{user `guest_os_type`}}",
+      "http_directory": "http",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "sha1",
+      "iso_url": "{{user `iso_url`}}",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "echo '/sbin/halt -h -p' > /tmp/shutdown.sh; echo 'vagrant'|sudo -S sh '/tmp/shutdown.sh'",
+      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+      "virtualbox_version_file": ".vbox_version",
+      "vboxmanage": [
+        [ "modifyvm", "{{.Name}}", "--memory", "512" ],
+        [ "modifyvm", "{{.Name}}", "--cpus", "1" ]
+      ]
+    },
+    {
+      "type": "vmware-iso",
+      "boot_command": [ "{{user `boot_command`}}http://{{ .HTTPIP }}:{{ .HTTPPort }}/{{user `os`}}.ks<enter><wait>" ],
+      "boot_wait": "10s",
+      "headless" : "{{user `headless`}}",
+      "disk_size": 40520,
+      "guest_os_type": "{{user `guest_os_type`}}",
+      "http_directory": "http",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "sha1",
+      "iso_url": "{{user `iso_url`}}",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "echo '/sbin/halt -h -p' > /tmp/shutdown.sh; echo 'vagrant'|sudo -S sh '/tmp/shutdown.sh'",
+      "vm_name": "packer-{{user `os`}}-vmware-iso",
+      "vmx_data": {
+        "memsize": "512",
+        "numvcpus": "1",
+        "cpuid.coresPerSocket": "1",
+        "virtualHW.version" : "9"
+      },
+      "vmx_data_post" : {
+        "ethernet0.virtualDev": "vmxnet3"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant'|sudo -S sh '{{.Path}}'",
+      "override": {
+        "virtualbox": {
+          "scripts": [
+            "scripts/{{user `os`}}/pre.sh",
+            "scripts/common/base.sh",
+            "scripts/common/vagrant.sh",
+            "scripts/common/virtualbox.sh",
+            "scripts/{{user `os`}}/{{user `application`}}.sh",
+            "scripts/common/cleanup.sh",
+            "scripts/{{user `os`}}/post.sh"
+          ]
+        },
+        "vmware-iso": {
+          "scripts": [
+            "scripts/{{user `os`}}/pre.sh",
+            "scripts/common/base.sh",
+            "scripts/common/vagrant.sh",
+            "scripts/{{user `os`}}/vmware.sh",
+            "scripts/{{user `os`}}/{{user `application`}}.sh",
+            "scripts/common/cleanup.sh",
+            "scripts/{{user `os`}}/post.sh"
+          ]
+        }
+      }
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "compression_level": 1,
+      "output": "vagrant/packer-{{ user `os`}}-{{.BuildName}}.box"
+    },
+  {
+    "type": "vagrant-vmware-ovf",
+        "only": ["vmware-iso"],
+        "compression_level": 9,
+        "output": "vmware-ovf/packer-{{ user `os`}}-{{.BuildName}}.box"
+  }
+  ]
+}

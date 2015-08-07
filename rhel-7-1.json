@@ -1,0 +1,7 @@
+{
+  "os": "rhel",
+  "iso_checksum": "9af515956bb428f697aa6e30791c032a00060d1e",
+  "iso_url": "http://your.host.here/rhel-server-7.1-x86_64-dvd.iso",
+	"boot_command": "<tab> append net.ifnames=0 initrd=initrd.img inst.text inst.ks=",
+  "guest_os_type": "rhel7_64"
+}

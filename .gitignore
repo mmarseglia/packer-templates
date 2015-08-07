@@ -1,0 +1,7 @@
+tmp
+packer_cache
+*.box
+output-*
+*.ovf
+*.vmdk
+*.mf

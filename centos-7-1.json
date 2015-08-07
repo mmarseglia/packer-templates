@@ -1,0 +1,7 @@
+{
+  "os": "centos-7-1",
+  "iso_checksum": "7c1e34e95c991175290d704dbdcc6531774cbecb",
+  "iso_url": "http://your.host.here/CentOS-7-x86_64-Minimal-1503-01.iso",
+	"boot_command" : "<tab> append net.ifnames=0 initrd=initrd.img inst.text inst.ks=",
+  "guest_os_type": "rhel7-64"
+}
