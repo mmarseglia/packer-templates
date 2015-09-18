@@ -1,17 +1,13 @@
-#packer-templates
+# packer-templates
 
-Packer template for building Vagrant base boxes.  The template is written to be customized at the os and application layers.  Customization is achived for an image by creating a variable file and corresponding scripts.
+Packer template for building Vagrant base boxes.  Written to be customized at
+the os and application layers.  Customization is achieved by creating a variable
+file and corresponding scripts.
 
-##Terms
+## Method
 
-* operating system (OS)
-	* CentOS 6.x, RHEL, etc.
-	* The operating system and version.
-
-##Methodology
-
-The OS is used to create customizable images without changing the template.
-The "application" layer adds customizations for a specific application.
+Application customization is layered on top of a standard OS template. The
+application layer consists of specific application customizations.
 
 Scripts are applied in order:
 
@@ -35,7 +31,7 @@ The order as defined in the template:
 "scripts/{{user `os`}}/post.sh"
 ```
 
-Here is an example of what a CentOS 6.6, 64-bit, base box would apply in order:
+Example CentOS 6.6 x64 base image scripts applied in order:
 
 ```
 packer-templates/scripts
@@ -67,7 +63,7 @@ User variables are defined in a variables file:
 * guest_os_type
 	* Passed to the hypervisor helps it determine what OS type is installed
 
-Example: Cent OS 6.6, x64, base image.
+Example Cent OS 6.6, x64, base image.
 
 ```
 "os": "centos-6-6",
@@ -77,31 +73,37 @@ Example: Cent OS 6.6, x64, base image.
 "guest_os_type": "centos-64"
 ```
 
-##Usage
+## Usage
 
-###Install Packer
+### Install Packer
 
-Download the latest packer [http://www.packer.io/downloads.html](http://www.packer.io/downloads.html) and unzip the appropriate directory.  Full install instructions [https://packer.io/docs/installation.html](https://packer.io/docs/installation.html).
+Download the latest packer
+[http://www.packer.io/downloads.html](http://www.packer.io/downloads.html) and
+unzip the appropriate directory.  Full install instructions
+[https://packer.io/docs/installation.html](https://packer.io/docs/installation.html).
 
-####OS X, Homebrew
+#### OS X, Homebrew
 
 ```
 brew install packer
 ```
 
-####Windows, Chocolatey
+#### Windows, Chocolatey
 ```
 choco install packer
 ```
 
-###Install the packer vmware-ovf plugin
+### Install the packer vmware-ovf plugin
 
-You must download and install the packer vmware-ovf plugin [https://github.com/gosddc/packer-post-processor-vagrant-vmware-ovf]() plugin to create VMware virtual machines with this template.
+You must download and install the packer vmware-ovf plugin
+[https://github.com/gosddc/packer-post-processor-vagrant-vmware-ovf]() to create
+VMware virtual machines with this template.
 
 
-###Run Packer
+### Run Packer
 
-You must specify the option **-var-file** and associated variable file for the image you want to build.
+You must specify the option **-var-file** and associated variable file for the
+image you want to build.
 
 ```
 git clone this repository
@@ -115,19 +117,23 @@ create a CentOS 6.6 image specify the centos-6-6.json variable file.
 packer build -only vmware-iso -var-file centos-6-6.json template.json
 ```
 
-You can  also override variables on the command line if you want to use a
+You can also override variables on the command line if you want to use a
 different download location for the ISO.
 
 ```
 packer build -only vmware-iso -var-file centos-6-6.json -var 'iso_url=http://your.download.location' template.json
 ```
 
-##Output
+## Output
 Packer will place the resulting builds in the vagrant or vmware-ovf directories.
 Images made using the vmware-iso builder will produce a Vagrant image and a
 VMware OVF image.  The VMware OVF image is suitable for import into any platform
 that supports OVF including, but not limited to, vCenter and vCloud Air.
 
-##Supported versions
+## Supported versions
 
 This template tested using packer 0.8.1.
+
+## Author
+
+mike@marseglia.org
